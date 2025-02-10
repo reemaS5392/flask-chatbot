@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jazan University Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .chatbox { width: 300px; position: fixed; bottom: 20px; right: 20px; background: #f9f9f9; border-radius: 10px; border: 1px solid #ddd; padding: 10px; display: none; }
+        .chatbox-header { background: #007bff; color: white; padding: 10px; border-radius: 10px 10px 0 0; cursor: pointer; }
+        .messages { height: 250px; overflow-y: auto; padding: 10px; }
+        .input-area { display: flex; }
+        .input-area input { flex: 1; padding: 5px; border: 1px solid #ddd; }
+        .input-area button { background: #007bff; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .toggle-chat { position: fixed; bottom: 20px; right: 20px; background: #007bff; color: white; padding: 10px; border-radius: 50%; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <button class="toggle-chat" onclick="toggleChat()">💬</button>
+    <div class="chatbox">
+        <div class="chatbox-header" onclick="toggleChat()">Jazan University Chatbot</div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script>
+        function toggleChat() {
+            let chatbox = document.querySelector('.chatbox');
+            chatbox.style.display = chatbox.style.display === 'block' ? 'none' : 'block';
+        }
+        function sendMessage() {
+            let input = document.getElementById("userInput");
+            let message = input.value.trim();
+            if (message === "") return;
+            
+            let chatMessages = document.getElementById("messages");
+            chatMessages.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+            input.value = "";
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatMessages.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+    </script>
+</body>
+</html>
